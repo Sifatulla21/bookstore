@@ -10,7 +10,7 @@ if(isset($_POST['submit']))
     echo '<div class="alert alert-danger alert-dismissable">Error: please select file</div>';
 
   }else{
-      $target = "user/images/";
+      $target = "";
 
       $file_name= $_FILES['image']['name'];
       $file_type = $_FILES['image']['type'];
