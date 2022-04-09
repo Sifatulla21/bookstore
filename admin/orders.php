@@ -1,0 +1,106 @@
+<?php
+ require_once 'header.php';
+ require_once 'logincheck.php';
+ require '../config.php';
+$output='';
+$sql = "SELECT * FROM orders ORDER BY order_id DESC";
+
+$res = mysqli_query($link,$sql);
+
+$total = mysqli_num_rows($res);
+
+ $output.= '<table class="table table-hover table-primary ">
+    <thead class ="bg-dark text-white text-strong">
+    <tr>
+      <td>USER ID</td>
+      <td>Username</td>
+      <td>Orders</td>
+      <td>Quantity</td>
+      <td>Total Price(&#2547)</td>
+      <td>Payment Status</td>
+      <td>Order Status</td>
+      <td>Payment Method</td>
+      <td>Date</td>
+      <td>Action</td>
+    </tr></thead>';
+
+while ($row = mysqli_fetch_array($res)) {
+  
+    $user_id = $row['user_id'];
+    $sql = "SELECT user_id,username FROM login WHERE user_id = '$user_id' ";
+    $r = mysqli_query($link,$sql);
+    while($u = mysqli_fetch_array($r)){
+
+      $username = $row['username'];
+    }
+  
+  $output.= '<tr>
+      <td>'.$row['user_id'].'</td>
+      <td>'.$row['username'].'</td>
+      <td>'.$row['book_name'].'</td>
+      <td>'.$row['quantity'].'</td>
+      <td>'.$row['total_price'].'</td>
+      <td>'.$row['paid'].'</td>
+      <td>'.$row['status'].'
+        <form method="post" class="form">
+        <div class="form-group">
+        <select name="status" class="form-control">
+        <option value="order processing by seller">order processing by seller</option>
+        <option value="item packed">Item packed</option>
+        <option value="dispatched">Dispatched</option>
+        <option value="out for delivery">out for delivery</option>
+        <option value="delivered">Item delivered</option>
+        </select>
+
+        
+        </div>
+       
+      </td>
+      <td>'.$row['payment_method'].'</td>
+      <td>'.$row['date_of_purchase'].'</td>
+      <td>
+      <input type="hidden" value="'.$row['order_id'].'" name="order_id">
+      <button class="btn btn-sm btn-success mt-1" name="update" type="submit"> update</button>
+       </form>
+      </td>
+    </tr>';
+
+
+}
+
+$output.='</table>';
+
+if (isset($_POST['update'])) {
+  
+  $status = $_POST['status'];
+  $order_id = $_POST['order_id'];
+
+  $sql = "UPDATE orders SET status = '$status' WHERE order_id = '$order_id' ";
+
+  $res = mysqli_query($link,$sql);
+
+  if($res){
+
+    $status_info = "<div class='alert alert-success'>Order Updated Successfully</div>";
+  }else{
+    $status_info = "<div class='alert alert-danger'>Problem in updating status</div>";
+  }
+}
+ ?>
+   <body style="background-image: url(images/bg-img.jpg);">
+   <div class="container" style="background-color:transparent;">
+   <div class="row">
+     
+     <div class="col-lg-12">
+      <?php  if (isset($status)) {
+         echo $status_info;
+         echo '<script> window.setTimeout(function(){
+                window.location.href = window.location.href;
+         },1000);</script>';  
+      } ?>
+      <span class="float-right mb-3"><h5 style="color: white; font-weight: bolder;">TOTAL ORDERS : <?php echo $total; ?></h5></span>
+      <?php echo $output;?>
+     </div>
+   </div>
+ </div>
+<?php require_once 'footer.php';?>
